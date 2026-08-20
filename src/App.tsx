@@ -1,9 +1,10 @@
-import "./App.css";
+import { Button } from "@mantine/core";
 
 function App() {
   return (
     <>
-      <h1>PLMS</h1>
+      <h1 className="text-2xl">PLMS</h1>
+      <Button>Click Me!</Button>
     </>
   );
 }
