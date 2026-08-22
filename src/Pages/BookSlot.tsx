@@ -1,14 +1,8 @@
 import { Button, Checkbox, Select, TextInput } from "@mantine/core";
-import {
-  type SlotType,
-  type SlotTypeAData,
-  type SlotTypeBData,
-  type SlotTypeCData,
-  type Slots,
-} from "../Types/slotType";
 import { DateTimePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
+import type { ActiveSlot, Slot, Slots, VehicleType } from "../Types/slotType";
 
 // const data: Slots = [
 //   {
@@ -74,29 +68,169 @@ import { useState } from "react";
 //   },
 // ];
 
-const dataA: SlotTypeAData[] = [
+// const dataA: SlotTypeAData[] = [
+//   {
+//     slotName: "A1",
+//     isOccupied: true,
+
+//   },
+// ];
+
+// const dataB: SlotTypeBData[] = [
+//   {
+//     slotName: "B1",
+//     isOccupied: false,
+//   },
+// ];
+
+// const dataC: SlotTypeCData[] = [
+//   {
+//     slotName: "C1",
+//     isOccupied: true,
+//   },
+// ];
+
+const initialData: Slots = {
+  A1: {
+    slotName: "A1",
+    supportVehicleType: ["BIKE", "CAR"],
+  },
+  A2: {
+    slotName: "A2",
+    supportVehicleType: ["BIKE", "CAR"],
+  },
+  A3: {
+    slotName: "A3",
+    supportVehicleType: ["BIKE", "CAR"],
+  },
+  A4: {
+    slotName: "A4",
+    supportVehicleType: ["BIKE", "CAR"],
+  },
+  A5: {
+    slotName: "A5",
+    supportVehicleType: ["BIKE", "CAR"],
+  },
+  B1: {
+    slotName: "B1",
+    supportVehicleType: ["CAR", "SUV"],
+  },
+  B2: {
+    slotName: "B2",
+    supportVehicleType: ["CAR", "SUV"],
+  },
+  B3: {
+    slotName: "B3",
+    supportVehicleType: ["CAR", "SUV"],
+  },
+  B4: {
+    slotName: "B4",
+    supportVehicleType: ["CAR", "SUV"],
+  },
+  B5: {
+    slotName: "B5",
+    supportVehicleType: ["CAR", "SUV"],
+  },
+  C1: {
+    slotName: "C1",
+    supportVehicleType: ["BIKE", "CAR", "SUV"],
+  },
+  C2: {
+    slotName: "C2",
+    supportVehicleType: ["BIKE", "CAR", "SUV"],
+  },
+  C3: {
+    slotName: "C3",
+    supportVehicleType: ["BIKE", "CAR", "SUV"],
+  },
+  C4: {
+    slotName: "C4",
+    supportVehicleType: ["BIKE", "CAR", "SUV"],
+  },
+  C5: {
+    slotName: "C5",
+    supportVehicleType: ["BIKE", "CAR", "SUV"],
+  },
+};
+
+const activeSlotData: ActiveSlot[] = [
   {
     slotName: "A1",
-    isOccupied: true,
+    vehicleNumber: "GJ01AB1234",
+    vehicleType: "CAR",
+    entryTime: "11:00",
   },
-];
-
-const dataB: SlotTypeBData[] = [
+  {
+    slotName: "A2",
+    vehicleNumber: "GJ01AB1234",
+    vehicleType: "CAR",
+    entryTime: "11:00",
+  },
+  {
+    slotName: "A4",
+    vehicleNumber: "GJ01AB1234",
+    vehicleType: "CAR",
+    entryTime: "11:00",
+  },
+  {
+    slotName: "A3",
+    vehicleNumber: "GJ02NK8690",
+    vehicleType: "BIKE",
+    entryTime: "1:00",
+  },
+  {
+    slotName: "A5",
+    vehicleNumber: "GJ02NK8690",
+    vehicleType: "BIKE",
+    entryTime: "1:00",
+  },
   {
     slotName: "B1",
-    isOccupied: false,
+    vehicleNumber: "GJ13ER9045",
+    vehicleType: "SUV",
+    entryTime: "3:34",
   },
-];
-
-const dataC: SlotTypeCData[] = [
+  {
+    slotName: "B5",
+    vehicleNumber: "GJ11YU0009",
+    vehicleType: "CAR",
+    entryTime: "1:60",
+  },
   {
     slotName: "C1",
-    isOccupied: true,
+    vehicleNumber: "GJ18G5674",
+    vehicleType: "SUV",
+    entryTime: "11:05",
+  },
+  {
+    slotName: "C2",
+    vehicleNumber: "GJ18G5674",
+    vehicleType: "SUV",
+    entryTime: "11:05",
+  },
+  {
+    slotName: "C3",
+    vehicleNumber: "GJ18G5674",
+    vehicleType: "SUV",
+    entryTime: "11:05",
+  },
+  {
+    slotName: "C4",
+    vehicleNumber: "GJ01DR76432",
+    vehicleType: "CAR",
+    entryTime: "9:45",
+  },
+  {
+    slotName: "C5",
+    vehicleNumber: "GJ01DR76432",
+    vehicleType: "CAR",
+    entryTime: "9:45",
   },
 ];
 
 const BookSlot = () => {
   const [checked, setChecked] = useState<boolean>(true);
+  const [vehType, setVehType] = useState<VehicleType | null>(null);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -126,18 +260,49 @@ const BookSlot = () => {
     },
   });
 
-  const selectSlotData = data
-    .filter((val: SlotType) => {
-      if (val.isOccupied === false) {
-        return true;
-      }
-    })
-    .map((val: SlotType) => val.slotName);
+  form.watch("vehicleType", ({ value }) => {
+    setVehType(value);
+  });
 
-  const handleSubmit = async (values: typeof form.values) => {
-    console.log(values);
-    form.reset();
+  const occupiedSlotName = activeSlotData.map(
+    (activeSlot: ActiveSlot) => activeSlot.slotName,
+  );
+
+  const newInitialData = Object.values(initialData).filter(
+    (val) => !occupiedSlotName.includes(val.slotName),
+  );
+
+  const selectSlotData = (vehicleType: VehicleType) => {
+    return newInitialData
+      .filter((slot: Slot) => {
+        return slot.supportVehicleType.includes(vehicleType);
+      })
+      .map((slot: Slot) => slot.slotName);
+  };
+
+  const isVehicleOccupied = (vehicleNumber: string) => {
+    return activeSlotData.find((val) => val.vehicleNumber === vehicleNumber);
+  };
+
+  const handleSubmit = async (formData: typeof form.values) => {
+    console.log(formData);
+    const isExist = isVehicleOccupied(formData.vehicleNumber.toUpperCase());
+
+    if (formData.isChecked === true && formData.slotName === "") {
+      const slotName = selectSlotData(formData.vehicleType).at(0);
+      if (slotName) {
+        console.log(slotName);
+      }
+      console.log("Slot is Full");
+    }
+    if (isExist) {
+      console.log("This vehicle already occupy the slot.");
+      return;
+    }
+
     setChecked(true);
+    setVehType(null);
+    form.reset();
   };
 
   return (
@@ -166,9 +331,8 @@ const BookSlot = () => {
         /> */}
 
           <TextInput
-            required
             label="Vehicle No."
-            placeholder="Vehicle number"
+            placeholder="Vehicle Number"
             key={form.key("vehicleNumber")}
             {...form.getInputProps("vehicleNumber")}
             className="w-50"
@@ -177,29 +341,35 @@ const BookSlot = () => {
           <Select
             required
             label="Vehicle Type"
-            placeholder="Select Vehicle type"
+            placeholder="Select Vehicle Type"
             data={["BIKE", "CAR", "SUV"]}
             key={form.key("vehicleType")}
             {...form.getInputProps("vehicleType")}
           />
-          <Checkbox
-            label="Automatic Slot Assign"
-            key={form.key("isChecked")}
-            {...form.getInputProps("isChecked", { type: "checkbox" })}
-            onClick={() => {
-              if (checked === false) {
-                form.setFieldValue("slotName", "");
-              }
-              setChecked((val) => !val);
-            }}
-          />
 
-          {checked === false && (
+          {vehType !== null && (
+            <Checkbox
+              label="Automatic Slot Assign"
+              key={form.key("isChecked")}
+              {...form.getInputProps("isChecked", { type: "checkbox" })}
+              onClick={() => {
+                if (checked === false) {
+                  form.setFieldValue("slotName", "");
+                }
+                setChecked((val) => !val);
+              }}
+            />
+          )}
+
+          {checked === false && vehType && (
             <Select
               required
               label="Slot Name."
-              placeholder="Select Slot name"
-              data={selectSlotData}
+              placeholder="Select Slot Name"
+              data={selectSlotData(vehType)}
+              nothingFoundMessage={
+                selectSlotData(vehType).length === 0 ? "No Slot Available" : ""
+              }
               key={form.key("slotName")}
               {...form.getInputProps("slotName")}
             />

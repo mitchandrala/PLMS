@@ -17,44 +17,60 @@ export type SlotName =
   | "C4"
   | "C5";
 
-type SlotA = "BIKE" | "CAR";
-type SlotB = "CAR" | "SUV";
-type SlotC = VehicleType;
+export type Slot = {
+  slotName: SlotName;
+  supportVehicleType: VehicleType[];
+};
 
-export type VehicleDetails = {
+export type Slots = Record<SlotName, Slot>;
+
+export type ActiveSlot = {
+  slotName: SlotName;
   vehicleNumber: string;
   vehicleType: VehicleType;
-};
-
-export type SlotType<T, K> = {
-  slotName: K;
-  isOccupied: boolean;
-  supportVehicleType?: T;
-  vehicleDetails?: VehicleDetails;
-  charge?: number;
-  entryTime?: Date;
-  exitTime?: Date;
-};
-
-export type SlotTypeA = Extract<SlotName, "A1" | "A2" | "A3" | "A4" | "A5">;
-export type SlotTypeB = Extract<SlotName, "B1" | "B2" | "B3" | "B4" | "B5">;
-export type SlotTypeC = Extract<SlotName, "C1" | "C2" | "C3" | "C4" | "C5">;
-
-// export type Slots = SlotType[];
-
-export type SlotTypeAData = SlotType<SlotA, SlotTypeA>;
-export type SlotTypeBData = SlotType<SlotB, SlotTypeB>;
-export type SlotTypeCData = SlotType<SlotC, SlotTypeC>;
-
-export type Slots = SlotTypeAData[] & SlotTypeBData[] & SlotTypeCData[];
-
-export type InitialValue = {
-  slotName: SlotName | string;
-  vehicleNumber: string;
-  vehicleType: VehicleType | string;
-  isChecked: boolean;
   entryTime: string;
+  exitTime?: string;
+  charge?: number;
 };
+
+// type SlotA = "BIKE" | "CAR";
+// type SlotB = "CAR" | "SUV";
+// type SlotC = VehicleType;
+
+// export type VehicleDetails<T> = {
+//   vehicleNumber: string;
+//   vehicleType: T;
+// };
+
+// export type SlotType<T, K> = {
+//   slotName: K;
+//   isOccupied: boolean;
+//   supportVehicleTypesupportVehicleType: T[];
+//   vehicleDetails?: VehicleDetails<T>;
+//   charge?: number;
+//   entryTime?: Date;
+//   exitTime?: Date;
+// };
+
+// export type SlotTypeA = Extract<SlotName, "A1" | "A2" | "A3" | "A4" | "A5">;
+// export type SlotTypeB = Extract<SlotName, "B1" | "B2" | "B3" | "B4" | "B5">;
+// export type SlotTypeC = Extract<SlotName, "C1" | "C2" | "C3" | "C4" | "C5">;
+
+// // export type Slots = SlotType[];
+
+// export type SlotTypeAData = SlotType<SlotA, SlotTypeA>[];
+// export type SlotTypeBData = SlotType<SlotB, SlotTypeB>[];
+// export type SlotTypeCData = SlotType<SlotC, SlotTypeC>[];
+
+// export type Slots = SlotTypeAData & SlotTypeBData & SlotTypeCData;
+
+// export type InitialValue = {
+//   slotName: SlotName | string;
+//   vehicleNumber: string;
+//   vehicleType: VehicleType | string;
+//   isChecked: boolean;
+//   entryTime: string;
+// };
 
 // export type Slots = [
 //   A1: SlotType,
