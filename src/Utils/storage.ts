@@ -17,6 +17,7 @@ export const getStorageData = (key: Key) => {
 export const setStorageData = (key: Key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    return true;
   } catch (error) {
     console.log(error);
   }

@@ -35,6 +35,14 @@ export type ActiveSlot = {
 
 export type SlotHistory = Required<ActiveSlot>;
 
+export type FormData = {
+  slotName: SlotName | null;
+  vehicleNumber: string;
+  vehicleType: VehicleType | null;
+  isChecked?: boolean;
+  entryTime: string;
+};
+
 // type SlotA = "BIKE" | "CAR";
 // type SlotB = "CAR" | "SUV";
 // type SlotC = VehicleType;

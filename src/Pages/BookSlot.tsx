@@ -2,41 +2,44 @@ import { Button, Checkbox, Select, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import type { ActiveSlot, Slot, VehicleType } from "../Types/slotType";
-import { getStorageData } from "../Utils/storage";
+import type { FormData, VehicleType } from "../Types/slotType";
+import {
+  availableSlotNameByVehicleType,
+  isVehicleOccupied,
+  saveSlotForm,
+} from "../Utils/helper";
 
 const BookSlot = () => {
   const [checked, setChecked] = useState<boolean>(true);
   const [vehType, setVehType] = useState<VehicleType | null>(null);
 
-  const data = getStorageData("slotHistoryData");
-  console.log(data);
+  const initialValue: FormData = {
+    slotName: null,
+    vehicleNumber: "",
+    vehicleType: null,
+    isChecked: checked,
+    entryTime: "",
+  };
 
   const form = useForm({
     mode: "uncontrolled",
-    initialValues: {
-      slotName: "",
-      vehicleNumber: "",
-      vehicleType: "",
-      isChecked: checked,
-      entryTime: "",
-    },
+    initialValues: initialValue,
     validate: {
       vehicleNumber: (value) => {
         if (value.length < 9) return "Enter valid vehicle number";
         if (value.length >= 9) {
-          return /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/i.test(value)
+          return /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/.test(value)
             ? null
             : "Invalid vehicle number";
         }
       },
-      vehicleType: (value) =>
-        value.length < 1 ? "Vehicle Type is required" : null,
+      vehicleType: (value) => {
+        return value === null ? "Vehicle Type is required" : null;
+      },
       entryTime: (value) =>
         value.length < 1 ? "Entry Time is required" : null,
-      slotName: (value: string) =>
-        checked === false &&
-        (value.length < 1 ? "Slot Name is required" : null),
+      slotName: (value) =>
+        checked === false && (value === null ? "Slot Name is required" : null),
     },
   });
 
@@ -44,40 +47,41 @@ const BookSlot = () => {
     setVehType(value);
   });
 
-  const occupiedSlotName = activeSlotData.map(
-    (activeSlot: ActiveSlot) => activeSlot.slotName,
-  );
+  const handleSubmit = async (formData: FormData) => {
+    const { isChecked, ...rest } = formData;
 
-  const newInitialData = Object.values(initialData).filter(
-    (val) => !occupiedSlotName.includes(val.slotName),
-  );
-
-  const selectSlotData = (vehicleType: VehicleType) => {
-    return newInitialData
-      .filter((slot: Slot) => {
-        return slot.supportVehicleType.includes(vehicleType);
-      })
-      .map((slot: Slot) => slot.slotName);
-  };
-
-  const isVehicleOccupied = (vehicleNumber: string) => {
-    return activeSlotData.find((val) => val.vehicleNumber === vehicleNumber);
-  };
-
-  const handleSubmit = async (formData: typeof form.values) => {
-    console.log(formData);
-    const isExist = isVehicleOccupied(formData.vehicleNumber.toUpperCase());
-
-    if (formData.isChecked === true && formData.slotName === "") {
-      const slotName = selectSlotData(formData.vehicleType).at(0);
-      if (slotName) {
-        console.log(slotName);
-      }
-      console.log("Slot is Full");
-    }
+    // is Vehicle Already Occupy?
+    const isExist = isVehicleOccupied(formData.vehicleNumber);
     if (isExist) {
       console.log("This vehicle already occupy the slot.");
       return;
+    }
+
+    // Automatic Slot Assign
+    if (formData.isChecked === true && formData.slotName === null) {
+      if (!formData?.vehicleType) return;
+      const slotName = availableSlotNameByVehicleType(formData?.vehicleType).at(
+        0,
+      );
+      if (slotName) {
+        const slotBookData = {
+          ...rest,
+          slotName: slotName,
+        };
+        const res = saveSlotForm(slotBookData);
+        if (res) console.log("Saved by Auto");
+        console.log(slotBookData);
+      } else {
+        console.log("Slot is Full");
+      }
+    }
+
+    // Manually Slot
+    if (formData.isChecked === false && formData.slotName !== null) {
+      const slotBookData = { ...rest };
+      const res = saveSlotForm(slotBookData);
+      if (res) console.log("Saved by manually");
+      console.log(slotBookData);
     }
 
     setChecked(true);
@@ -93,23 +97,6 @@ const BookSlot = () => {
           onSubmit={form.onSubmit(handleSubmit)}
           className="w-50 flex flex-col gap-5"
         >
-          {/* <MaskInput
-          required
-          label="Vehicle No."
-          mask="AA 99 AA 9999"
-          // key={form.key("vehicleNumber")}
-          placeholder="__ __ __ ____"
-          defaultValue={String(form.getValues().vehicleNumber)}
-          onChangeRaw={(raw) =>
-            form.setFieldValue("vehicleNumber", raw, { forceUpdate: false })
-          }
-          className="w-50"
-          error={
-            form.getValues().vehicleNumber.length < 1 &&
-            "Invalid Vehicle Number"
-          }
-        /> */}
-
           <TextInput
             label="Vehicle No."
             placeholder="Vehicle Number"
@@ -134,7 +121,7 @@ const BookSlot = () => {
               {...form.getInputProps("isChecked", { type: "checkbox" })}
               onClick={() => {
                 if (checked === false) {
-                  form.setFieldValue("slotName", "");
+                  form.setFieldValue("slotName", null);
                 }
                 setChecked((val) => !val);
               }}
@@ -146,9 +133,11 @@ const BookSlot = () => {
               required
               label="Slot Name."
               placeholder="Select Slot Name"
-              data={selectSlotData(vehType)}
+              data={availableSlotNameByVehicleType(vehType)}
               nothingFoundMessage={
-                selectSlotData(vehType).length === 0 ? "No Slot Available" : ""
+                availableSlotNameByVehicleType(vehType).length === 0
+                  ? "No Slot Available"
+                  : ""
               }
               key={form.key("slotName")}
               {...form.getInputProps("slotName")}
@@ -159,6 +148,7 @@ const BookSlot = () => {
             required
             className="w-50"
             label="Entry Time"
+            valueFormat="DD MMM YYYY hh:mm A"
             placeholder="Date with Time"
             key={form.key("entryTime")}
             {...form.getInputProps("entryTime")}
