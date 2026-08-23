@@ -33,6 +33,8 @@ export type ActiveSlot = {
   charge?: number;
 };
 
+export type SlotHistory = Required<ActiveSlot>;
+
 // type SlotA = "BIKE" | "CAR";
 // type SlotB = "CAR" | "SUV";
 // type SlotC = VehicleType;
