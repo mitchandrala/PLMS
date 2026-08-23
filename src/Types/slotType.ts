@@ -17,21 +17,60 @@ export type SlotName =
   | "C4"
   | "C5";
 
-export type VehicleDetails = {
+export type Slot = {
+  slotName: SlotName;
+  supportVehicleType: VehicleType[];
+};
+
+export type Slots = Record<SlotName, Slot>;
+
+export type ActiveSlot = {
+  slotName: SlotName;
   vehicleNumber: string;
   vehicleType: VehicleType;
-};
-
-export type SlotType = {
-  slotName: SlotName;
-  isOccupied: boolean;
-  vehicleDetails?: VehicleDetails;
+  entryTime: string;
+  exitTime?: string;
   charge?: number;
-  entryTime?: Date;
-  exitTime?: Date;
 };
 
-export type Slots = SlotType[];
+// type SlotA = "BIKE" | "CAR";
+// type SlotB = "CAR" | "SUV";
+// type SlotC = VehicleType;
+
+// export type VehicleDetails<T> = {
+//   vehicleNumber: string;
+//   vehicleType: T;
+// };
+
+// export type SlotType<T, K> = {
+//   slotName: K;
+//   isOccupied: boolean;
+//   supportVehicleTypesupportVehicleType: T[];
+//   vehicleDetails?: VehicleDetails<T>;
+//   charge?: number;
+//   entryTime?: Date;
+//   exitTime?: Date;
+// };
+
+// export type SlotTypeA = Extract<SlotName, "A1" | "A2" | "A3" | "A4" | "A5">;
+// export type SlotTypeB = Extract<SlotName, "B1" | "B2" | "B3" | "B4" | "B5">;
+// export type SlotTypeC = Extract<SlotName, "C1" | "C2" | "C3" | "C4" | "C5">;
+
+// // export type Slots = SlotType[];
+
+// export type SlotTypeAData = SlotType<SlotA, SlotTypeA>[];
+// export type SlotTypeBData = SlotType<SlotB, SlotTypeB>[];
+// export type SlotTypeCData = SlotType<SlotC, SlotTypeC>[];
+
+// export type Slots = SlotTypeAData & SlotTypeBData & SlotTypeCData;
+
+// export type InitialValue = {
+//   slotName: SlotName | string;
+//   vehicleNumber: string;
+//   vehicleType: VehicleType | string;
+//   isChecked: boolean;
+//   entryTime: string;
+// };
 
 // export type Slots = [
 //   A1: SlotType,
@@ -55,22 +94,4 @@ export type Slots = SlotType[];
 //   BIKE = "BIKE",
 //   CAR = "CAR",
 //   SUV = "SUV",
-// }
-
-// export enum SlotName {
-//   A1 = "A1",
-//   A2 = "A2",
-//   A3 = "A3",
-//   A4 = "A4",
-//   A5 = "A5",
-//   B1 = "B1",
-//   B2 = "B2",
-//   B3 = "B3",
-//   B4 = "B4",
-//   B5 = "B5",
-//   C1 = "C1",
-//   C2 = "C2",
-//   C3 = "C3",
-//   C4 = "C4",
-//   C5 = "C5",
 // }
