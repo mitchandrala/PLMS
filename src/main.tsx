@@ -5,11 +5,14 @@ import "@mantine/dates/styles.css";
 import App from "./App.tsx";
 import { MantineProvider } from "@mantine/core";
 import { BrowserRouter } from "react-router-dom";
+import { SlotProvider } from "./Context/slotContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <MantineProvider>
     <BrowserRouter>
-      <App />
+      <SlotProvider>
+        <App />
+      </SlotProvider>
     </BrowserRouter>
   </MantineProvider>,
 );

@@ -8,10 +8,14 @@ import {
   isVehicleOccupied,
   saveSlotForm,
 } from "../Utils/helper";
+import { useSlots } from "../Hooks/useSlots";
 
 const BookSlot = () => {
   const [checked, setChecked] = useState<boolean>(true);
   const [vehType, setVehType] = useState<VehicleType | null>(null);
+
+  const { activeSlots } = useSlots();
+  console.log("Book", activeSlots);
 
   const initialValue: FormData = {
     slotName: null,
