@@ -1,10 +1,10 @@
 import { Button, Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
-import type { ActiveSlot, Slot, SlotName } from "../Types/slotType";
+import type { ActiveSlot, Slot, VehicleType } from "../Types/slotType";
+import { countCharges, countMinute, entryTime } from "../Helper/dateHelper";
 
 const ViewAndManage = () => {
   const { activeSlots, slots } = useSlots();
-  console.log(activeSlots);
 
   const activeSlotName = activeSlots.map(
     (activeSlot: ActiveSlot) => activeSlot.slotName,
@@ -14,11 +14,20 @@ const ViewAndManage = () => {
     .filter((slot: Slot) => !activeSlotName.includes(slot.slotName))
     .map((slot: Slot) => slot.slotName);
 
-  const hanldeRelease = (value) => {
-    console.log(value);
+  const handleRelease = (value: ActiveSlot) => {
+    const evalue = entryTime(value.entryTime);
+    const exitTime = new Date();
+
+    console.log(evalue);
+    console.log(exitTime);
+
+    const min = countMinute(evalue, exitTime);
+    const charge = countCharges("BIKE", min);
+    console.log(charge);
+    console.log("final minutes:", min);
   };
 
-  const rows = activeSlots.map((slot) => (
+  const rows = activeSlots.map((slot: ActiveSlot) => (
     <Table.Tr key={slot.slotName}>
       <Table.Td>{slot?.slotName}</Table.Td>
       <Table.Td>{slot?.vehicleNumber}</Table.Td>
@@ -26,7 +35,7 @@ const ViewAndManage = () => {
       <Table.Td>{slot?.entryTime}</Table.Td>
       <Table.Td>
         <>
-          <Button size="sm" onClick={() => hanldeRelease(slot)}>
+          <Button size="sm" onClick={() => handleRelease(slot)}>
             Release
           </Button>
         </>
@@ -34,12 +43,6 @@ const ViewAndManage = () => {
     </Table.Tr>
   ));
 
-  const availableSlotRaw = filterSlot.map((val: SlotName) => (
-    <Table.Tr key={val}>
-      <Table.Td>{val}</Table.Td>
-      <Table.Td>Available</Table.Td>
-    </Table.Tr>
-  ));
   return (
     <div className="max-h-screen h-170 w-full flex flex-col p-10 gap-10">
       <div>
