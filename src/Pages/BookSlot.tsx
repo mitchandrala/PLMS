@@ -2,20 +2,56 @@ import { Button, Checkbox, Select, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import type { FormData, VehicleType } from "../Types/slotType";
-import {
-  availableSlotNameByVehicleType,
-  isVehicleOccupied,
-  saveSlotForm,
-} from "../Utils/helper";
+import type {
+  ActiveSlot,
+  FormData,
+  Slot,
+  SlotName,
+  VehicleType,
+} from "../Types/slotType";
 import { useSlots } from "../Hooks/useSlots";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../Routes/routes";
 
 const BookSlot = () => {
   const [checked, setChecked] = useState<boolean>(true);
   const [vehType, setVehType] = useState<VehicleType | null>(null);
 
-  const { activeSlots } = useSlots();
-  console.log("Book", activeSlots);
+  const navigate = useNavigate();
+
+  const { activeSlots, bookSlot, slots } = useSlots();
+
+  const availableSlotNameByVehicleType = (vehicleType: VehicleType) => {
+    let newSlotName = slots;
+    if (activeSlots) {
+      const activeSlotName: SlotName[] = activeSlots.map(
+        (slotData: ActiveSlot) => slotData.slotName,
+      );
+
+      newSlotName = slots.filter(
+        (val: Slot) => !activeSlotName.includes(val.slotName),
+      );
+    }
+
+    return newSlotName
+      ?.filter((slot: Slot) => slot.supportVehicleType.includes(vehicleType))
+      .map((slot: Slot) => slot.slotName);
+  };
+
+  const isVehicleOccupied = (vehicleNumber: string) => {
+    return activeSlots.find(
+      (val: ActiveSlot) => val.vehicleNumber === vehicleNumber,
+    );
+  };
+
+  const saveSlotForm = (value: ActiveSlot) => {
+    try {
+      bookSlot(value);
+      console.log("Slot Booked");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const initialValue: FormData = {
     slotName: null,
@@ -51,13 +87,10 @@ const BookSlot = () => {
     setVehType(value);
   });
 
-  const handleSubmit = async (formData: FormData) => {
-    const { isChecked, ...rest } = formData;
-
-    // is Vehicle Already Occupy?
+  const handleSubmit = async (formData: typeof form.values) => {
     const isExist = isVehicleOccupied(formData.vehicleNumber);
     if (isExist) {
-      console.log("This vehicle already occupy the slot.");
+      alert("This vehicle already occupy the slot.");
       return;
     }
 
@@ -68,23 +101,36 @@ const BookSlot = () => {
         0,
       );
       if (slotName) {
-        const slotBookData = {
-          ...rest,
+        const slotBookData: ActiveSlot = {
           slotName: slotName,
+          vehicleNumber: formData.vehicleNumber,
+          vehicleType: formData.vehicleType,
+          entryTime: formData.entryTime,
         };
-        const res = saveSlotForm(slotBookData);
-        if (res) console.log("Saved by Auto");
+        saveSlotForm(slotBookData);
+        alert(`Slot For ${slotBookData.vehicleNumber} is ${slotName}`);
+        navigate(ROUTES.VIEW_AND_MANAGE);
         console.log(slotBookData);
       } else {
-        console.log("Slot is Full");
+        alert("Slot is Full");
       }
     }
 
     // Manually Slot
     if (formData.isChecked === false && formData.slotName !== null) {
-      const slotBookData = { ...rest };
-      const res = saveSlotForm(slotBookData);
-      if (res) console.log("Saved by manually");
+      if (!formData?.vehicleType) return;
+
+      const slotBookData: ActiveSlot = {
+        slotName: formData.slotName,
+        vehicleNumber: formData.vehicleNumber,
+        vehicleType: formData.vehicleType,
+        entryTime: formData.entryTime,
+      };
+      saveSlotForm(slotBookData);
+      alert(
+        `Slot For ${slotBookData.vehicleNumber} is ${slotBookData.slotName}`,
+      );
+      navigate(ROUTES.VIEW_AND_MANAGE);
       console.log(slotBookData);
     }
 
