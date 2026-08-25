@@ -37,8 +37,11 @@ const findDayBtwMonth = (startMonth: number, endMonth: number) => {
   return totalDay;
 };
 
-export const countMinute = (entryTime: EntryValueType, exitTime: Date) => {
-  if (!entryTime || !exitTime) return;
+export const countMinute = (
+  entryTime: EntryValueType,
+  exitTime: Date,
+): number => {
+  if (!entryTime || !exitTime) return 0;
   const isSameYear = entryTime.year === exitTime.getFullYear();
   const isSameMonth = entryTime.month === exitTime.getMonth() + 1;
   const isSameDay = entryTime.day === exitTime.getDate();
@@ -52,7 +55,7 @@ export const countMinute = (entryTime: EntryValueType, exitTime: Date) => {
   }
 
   // Same Month
-  if (isSameYear && isSameMonth && !isSameDay) {
+  if (isSameYear && isSameMonth) {
     const pdayhour = 24 - (entryTime.hour + 1);
     const pdaymin = 60 - entryTime.min;
 
@@ -90,31 +93,78 @@ export const countMinute = (entryTime: EntryValueType, exitTime: Date) => {
     const totalMin = finalday * 24 * 60 + finalhour * 60 + finalmin;
     return totalMin;
   }
-  return;
+
+  // Different Year
+  if (!isSameYear) {
+    const entdayhour = 24 - (entryTime.hour + 1);
+    const entdaymin = 60 - entryTime.min;
+    const entmday = findDayMonth(entryTime.month) - (entryTime.day + 1);
+    const entmdiffday = findDayBtwMonth(entryTime.month + 1, 13);
+
+    const diffyear = exitTime.getFullYear() - (entryTime.year + 1);
+    const difftotalday = diffyear * 365;
+
+    const extmdiffday = findDayBtwMonth(0, exitTime.getMonth() + 1);
+    const extday = exitTime.getDate();
+    const extdayhour = exitTime.getHours();
+    const extdaymin = exitTime.getMinutes();
+
+    const finalday =
+      entmday + entmdiffday + difftotalday + extmdiffday + extday;
+    const finalhour = entdayhour + extdayhour;
+    const finalmin = entdaymin + extdaymin;
+
+    const totalMin = finalmin + finalhour * 60 + finalday * 24 * 60;
+    return totalMin;
+  }
+  return 0;
 };
 
 export const countCharges = (vehicleType: VehicleType, minutes: number) => {
   if (vehicleType === "BIKE") {
     if (minutes <= 120) {
-      return minutes * 0.1666;
+      return Math.floor(minutes * 0.1666);
     } else {
-      return minutes * 0.1666;
+      const firstTwoHour = 120 * 0.1666;
+      const remainHour = (minutes - 120) * 0.1666;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
 
   if (vehicleType === "CAR") {
     if (minutes <= 120) {
-      return minutes * 0.3333;
+      return Math.floor(minutes * 0.3333);
     } else {
-      return minutes * 0.3333;
+      const firstTwoHour = 120 * 0.3333;
+      const remainHour = (minutes - 120) * 0.3333;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
 
   if (vehicleType === "SUV") {
     if (minutes <= 120) {
-      return minutes * 0.5;
+      return Math.floor(minutes * 0.5);
     } else {
-      return minutes * 0.5;
+      const firstTwoHour = 120 * 0.5;
+      const remainHour = (minutes - 120) * 0.5;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
+  return 0;
+};
+
+export const showDuration = (minutes: number) => {
+  let day = 0;
+  let hour = 0;
+  let min = 0;
+  min = minutes % 60;
+  hour = Math.floor(minutes / 60);
+
+  if (hour >= 24) {
+    day = Math.floor(hour / 24);
+    hour = hour % 24;
+    return `${day}d ${hour}h ${min}m`;
+  }
+
+  return hour < 1 ? `${min}m` : `${hour}h ${min}m`;
 };

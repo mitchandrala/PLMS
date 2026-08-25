@@ -1,10 +1,15 @@
 import { Button, Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
-import type { ActiveSlot, Slot, VehicleType } from "../Types/slotType";
-import { countCharges, countMinute, entryTime } from "../Helper/dateHelper";
+import type { ActiveSlot, Slot, SlotHistory } from "../Types/slotType";
+import {
+  countCharges,
+  countMinute,
+  entryTime,
+  showDuration,
+} from "../Helper/dateHelper";
 
 const ViewAndManage = () => {
-  const { activeSlots, slots } = useSlots();
+  const { activeSlots, slots, releaseSlot } = useSlots();
 
   const activeSlotName = activeSlots.map(
     (activeSlot: ActiveSlot) => activeSlot.slotName,
@@ -18,13 +23,25 @@ const ViewAndManage = () => {
     const evalue = entryTime(value.entryTime);
     const exitTime = new Date();
 
-    console.log(evalue);
-    console.log(exitTime);
-
     const min = countMinute(evalue, exitTime);
-    const charge = countCharges("BIKE", min);
-    console.log(charge);
-    console.log("final minutes:", min);
+    if (min <= 0) {
+      alert("Could't Release");
+      return;
+    }
+    const charge = countCharges(value.vehicleType, min);
+    const duration = showDuration(min);
+
+    const data: SlotHistory = {
+      ...value,
+      charge: charge,
+      duration: duration,
+      exitTime: String(exitTime).slice(4, 24),
+    };
+
+    releaseSlot(value, data);
+    alert(
+      `Pay Charge: ₹${charge?.toLocaleString()} for ${duration} of parking`,
+    );
   };
 
   const rows = activeSlots.map((slot: ActiveSlot) => (
@@ -67,7 +84,7 @@ const ViewAndManage = () => {
         </Table>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mb-10">
         <div>
           <h2 className="text-md font-semibold">Available Slot:</h2>
         </div>

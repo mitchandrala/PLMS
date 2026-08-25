@@ -24,16 +24,18 @@ export type Slot = {
 
 export type Slots = Record<SlotName, Slot>;
 
-export type ActiveSlot = {
+export interface ActiveSlot {
   slotName: SlotName;
   vehicleNumber: string;
   vehicleType: VehicleType;
   entryTime: string;
-  exitTime?: string;
-  charge?: number;
-};
+}
 
-export type SlotHistory = Required<ActiveSlot>;
+export interface SlotHistory extends ActiveSlot {
+  exitTime: string;
+  charge: number;
+  duration: string;
+}
 
 export type FormData = {
   slotName: SlotName | null;
