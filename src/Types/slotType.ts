@@ -45,6 +45,8 @@ export type FormData = {
   entryTime: string;
 };
 
+export type TotalVehicle = Record<VehicleType, number>;
+
 // type SlotA = "BIKE" | "CAR";
 // type SlotB = "CAR" | "SUV";
 // type SlotC = VehicleType;
