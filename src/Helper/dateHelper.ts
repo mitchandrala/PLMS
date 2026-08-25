@@ -94,6 +94,7 @@ export const countMinute = (
     return totalMin;
   }
 
+  // Different Year
   if (!isSameYear) {
     const entdayhour = 24 - (entryTime.hour + 1);
     const entdaymin = 60 - entryTime.min;
@@ -122,25 +123,31 @@ export const countMinute = (
 export const countCharges = (vehicleType: VehicleType, minutes: number) => {
   if (vehicleType === "BIKE") {
     if (minutes <= 120) {
-      return minutes * 0.1666;
+      return Math.floor(minutes * 0.1666);
     } else {
-      return minutes * 0.1666;
+      const firstTwoHour = 120 * 0.1666;
+      const remainHour = (minutes - 120) * 0.1666;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
 
   if (vehicleType === "CAR") {
     if (minutes <= 120) {
-      return minutes * 0.3333;
+      return Math.floor(minutes * 0.3333);
     } else {
-      return minutes * 0.3333;
+      const firstTwoHour = 120 * 0.3333;
+      const remainHour = (minutes - 120) * 0.3333;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
 
   if (vehicleType === "SUV") {
     if (minutes <= 120) {
-      return minutes * 0.5;
+      return Math.floor(minutes * 0.5);
     } else {
-      return minutes * 0.5;
+      const firstTwoHour = 120 * 0.5;
+      const remainHour = (minutes - 120) * 0.5;
+      return Math.floor(firstTwoHour + remainHour);
     }
   }
 };

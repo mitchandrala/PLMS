@@ -23,7 +23,7 @@ const ViewAndManage = () => {
 
     const min = countMinute(evalue, exitTime);
     if (min <= 0) return;
-    const charge = countCharges("BIKE", min);
+    const charge = countCharges(value.vehicleType, min);
     console.log(charge);
     console.log("final minutes:", min);
   };
@@ -68,7 +68,7 @@ const ViewAndManage = () => {
         </Table>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mb-10">
         <div>
           <h2 className="text-md font-semibold">Available Slot:</h2>
         </div>
