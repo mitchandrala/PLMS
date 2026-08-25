@@ -1,6 +1,6 @@
 import { Button, Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
-import type { ActiveSlot, Slot, VehicleType } from "../Types/slotType";
+import type { ActiveSlot, Slot } from "../Types/slotType";
 import { countCharges, countMinute, entryTime } from "../Helper/dateHelper";
 
 const ViewAndManage = () => {
@@ -22,6 +22,7 @@ const ViewAndManage = () => {
     console.log(exitTime);
 
     const min = countMinute(evalue, exitTime);
+    if (min <= 0) return;
     const charge = countCharges("BIKE", min);
     console.log(charge);
     console.log("final minutes:", min);
