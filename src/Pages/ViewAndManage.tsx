@@ -1,7 +1,12 @@
 import { Button, Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
 import type { ActiveSlot, Slot } from "../Types/slotType";
-import { countCharges, countMinute, entryTime } from "../Helper/dateHelper";
+import {
+  countCharges,
+  countMinute,
+  entryTime,
+  showDuration,
+} from "../Helper/dateHelper";
 
 const ViewAndManage = () => {
   const { activeSlots, slots } = useSlots();
@@ -18,14 +23,15 @@ const ViewAndManage = () => {
     const evalue = entryTime(value.entryTime);
     const exitTime = new Date();
 
-    console.log(evalue);
-    console.log(exitTime);
+    // console.log(evalue);
+    // console.log(exitTime);
 
     const min = countMinute(evalue, exitTime);
     if (min <= 0) return;
     const charge = countCharges(value.vehicleType, min);
     console.log(charge);
     console.log("final minutes:", min);
+    console.log(showDuration(min));
   };
 
   const rows = activeSlots.map((slot: ActiveSlot) => (

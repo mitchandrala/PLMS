@@ -151,3 +151,19 @@ export const countCharges = (vehicleType: VehicleType, minutes: number) => {
     }
   }
 };
+
+export const showDuration = (minutes: number) => {
+  let day = 0;
+  let hour = 0;
+  let min = 0;
+  min = minutes % 60;
+  hour = Math.floor(minutes / 60);
+
+  if (hour >= 24) {
+    day = Math.floor(hour / 24);
+    hour = hour % 24;
+    return `${day}d ${hour}h ${min}m`;
+  }
+
+  return hour < 1 ? `${min}m` : `${hour}h ${min}m`;
+};
