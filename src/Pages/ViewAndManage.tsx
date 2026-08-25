@@ -1,6 +1,6 @@
 import { Button, Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
-import type { ActiveSlot, Slot } from "../Types/slotType";
+import type { ActiveSlot, Slot, SlotHistory } from "../Types/slotType";
 import {
   countCharges,
   countMinute,
@@ -9,7 +9,7 @@ import {
 } from "../Helper/dateHelper";
 
 const ViewAndManage = () => {
-  const { activeSlots, slots } = useSlots();
+  const { activeSlots, slots, releaseSlot } = useSlots();
 
   const activeSlotName = activeSlots.map(
     (activeSlot: ActiveSlot) => activeSlot.slotName,
@@ -23,15 +23,25 @@ const ViewAndManage = () => {
     const evalue = entryTime(value.entryTime);
     const exitTime = new Date();
 
-    // console.log(evalue);
-    // console.log(exitTime);
-
     const min = countMinute(evalue, exitTime);
-    if (min <= 0) return;
+    if (min <= 0) {
+      alert("Could't Release");
+      return;
+    }
     const charge = countCharges(value.vehicleType, min);
-    console.log(charge);
-    console.log("final minutes:", min);
-    console.log(showDuration(min));
+    const duration = showDuration(min);
+
+    const data: SlotHistory = {
+      ...value,
+      charge: charge,
+      duration: duration,
+      exitTime: String(exitTime).slice(4, 24),
+    };
+
+    releaseSlot(value, data);
+    alert(
+      `Pay Charge: ₹${charge?.toLocaleString()} for ${duration} of parking`,
+    );
   };
 
   const rows = activeSlots.map((slot: ActiveSlot) => (

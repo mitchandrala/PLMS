@@ -150,6 +150,7 @@ export const countCharges = (vehicleType: VehicleType, minutes: number) => {
       return Math.floor(firstTwoHour + remainHour);
     }
   }
+  return 0;
 };
 
 export const showDuration = (minutes: number) => {
