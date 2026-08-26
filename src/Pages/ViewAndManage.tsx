@@ -2,8 +2,11 @@ import { Button, Select, Table, TextInput } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
 import {
   type ActiveSlot,
+  type ActiveSlotTable,
   type Slot,
   type SlotHistory,
+  type SlotName,
+  type Status,
   type VehicleType,
 } from "../Types/slotType";
 import {
@@ -19,23 +22,10 @@ import { ROUTES } from "../Routes/routes";
 const ViewAndManage = () => {
   const [search, setSearch] = useState<string>("");
   const [vehicle, setVehicle] = useState<VehicleType | null>(null);
-  const { activeSlots, slots, releaseSlot } = useSlots();
-
+  const [status, setStatus] = useState<Status | null>(null);
   const navigate = useNavigate();
 
-  const searchList = useMemo(() => {
-    return activeSlots.filter((slot: ActiveSlot) => {
-      if (search && vehicle) {
-        return (
-          slot.vehicleNumber.match(search) && slot.vehicleType.match(vehicle)
-        );
-      } else if (vehicle) {
-        return slot.vehicleType.match(vehicle);
-      } else {
-        return slot.vehicleNumber.match(search);
-      }
-    });
-  }, [search, vehicle]);
+  const { activeSlots, slots, releaseSlot } = useSlots();
 
   const activeSlotName = activeSlots.map(
     (activeSlot: ActiveSlot) => activeSlot.slotName,
@@ -45,8 +35,54 @@ const ViewAndManage = () => {
     .filter((slot: Slot) => !activeSlotName.includes(slot.slotName))
     .map((slot: Slot) => slot.slotName);
 
-  const handleRelease = (value: ActiveSlot) => {
-    const evalue = entryTime(value.entryTime);
+  const tableData: ActiveSlotTable[] = slots.map((slot: Slot) => {
+    const activeSlot = activeSlots.find(
+      (activeSlot: ActiveSlot) => slot.slotName === activeSlot.slotName,
+    );
+    if (activeSlot) {
+      return { ...activeSlot, slotStatus: "OCCUPIED" };
+    } else {
+      return { slotName: slot.slotName, slotStatus: "AVAILABLE" };
+    }
+  });
+
+  const searchList = useMemo(() => {
+    return tableData.filter((slot: ActiveSlotTable) => {
+      if (search && vehicle && status) {
+        return (
+          slot.vehicleNumber?.match(search) &&
+          slot.vehicleType?.match(vehicle) &&
+          slot.slotStatus?.match(status)
+        );
+      } else if (vehicle && search) {
+        return (
+          slot.vehicleType?.match(vehicle) && slot.vehicleNumber?.match(search)
+        );
+      } else if (status && vehicle) {
+        return (
+          slot.slotStatus?.match(status) && slot.vehicleType?.match(vehicle)
+        );
+      } else if (status && search) {
+        return (
+          slot.slotStatus?.match(status) && slot.vehicleNumber?.match(search)
+        );
+      } else if (vehicle) {
+        return slot.vehicleType?.match(vehicle);
+      } else if (status) {
+        return slot.slotStatus?.match(status);
+      } else {
+        return slot.vehicleNumber?.match(search);
+      }
+    });
+  }, [search, vehicle, status]);
+
+  const handleRelease = (slotName: SlotName) => {
+    const slotData = activeSlots.find(
+      (activeSlot: ActiveSlot) => activeSlot.slotName === slotName,
+    );
+
+    if (!slotData) return;
+    const evalue = entryTime(slotData.entryTime);
     const exitTime = new Date();
 
     const min = countMinute(evalue, exitTime);
@@ -54,17 +90,17 @@ const ViewAndManage = () => {
       alert("Could't Release");
       return;
     }
-    const charge = countCharges(value.vehicleType, min);
+    const charge = countCharges(slotData.vehicleType, min);
     const duration = showDuration(min);
 
     const data: SlotHistory = {
-      ...value,
+      ...slotData,
       charge: charge,
       duration: duration,
       exitTime: String(exitTime).slice(4, 24),
     };
 
-    releaseSlot(value, data);
+    releaseSlot(slotData, data);
     alert(
       `Pay Charge: ₹${charge?.toLocaleString()} for ${duration} of parking`,
     );
@@ -72,18 +108,45 @@ const ViewAndManage = () => {
     navigate(ROUTES.PARKING_HISTORY);
   };
 
-  const rows = (search || vehicle ? searchList : activeSlots).map(
-    (slot: ActiveSlot) => (
+  const rows = (search || vehicle || status ? searchList : tableData).map(
+    (slot: ActiveSlotTable) => (
       <Table.Tr key={slot.slotName}>
-        <Table.Td>{slot?.slotName}</Table.Td>
-        <Table.Td>{slot?.vehicleNumber}</Table.Td>
-        <Table.Td>{slot?.vehicleType}</Table.Td>
-        <Table.Td>{slot?.entryTime}</Table.Td>
+        <Table.Td>{slot.slotName}</Table.Td>
+        <Table.Td>
+          <p
+            className={`${slot.slotStatus === "OCCUPIED" ? "text-red-600" : "text-green-600"}`}
+          >
+            {slot.slotStatus === "OCCUPIED" ? "Occupied" : "Available"}
+          </p>
+        </Table.Td>
+        <Table.Td>
+          {slot.slotStatus === "OCCUPIED" ? slot.vehicleNumber : "-"}
+        </Table.Td>
+        <Table.Td>
+          {slot.slotStatus === "OCCUPIED" ? slot.vehicleType : "-"}
+        </Table.Td>
+        <Table.Td>
+          {slot.slotStatus === "OCCUPIED" ? slot.entryTime : "-"}
+        </Table.Td>
         <Table.Td>
           <>
-            <Button size="sm" onClick={() => handleRelease(slot)}>
-              Release
-            </Button>
+            {slot.slotStatus === "OCCUPIED" ? (
+              <Button
+                size="xs"
+                variant="light"
+                onClick={() => handleRelease(slot?.slotName)}
+              >
+                Release
+              </Button>
+            ) : (
+              <Button
+                size="xs"
+                variant="light"
+                onClick={() => navigate(ROUTES.BOOK_SLOT)}
+              >
+                Book slot
+              </Button>
+            )}
           </>
         </Table.Td>
       </Table.Tr>
@@ -96,7 +159,7 @@ const ViewAndManage = () => {
         <h1 className="text-lg font-semibold text-center">View And Manage</h1>
       </div>
 
-      <div className="flex gap-10">
+      <div className="flex gap-10 justify-center">
         <div className="w-50">
           <TextInput
             value={search}
@@ -111,6 +174,20 @@ const ViewAndManage = () => {
             onChange={(val) => setVehicle(val)}
           />
         </div>
+        <div>
+          <Select
+            placeholder="Select Vehicle Type"
+            data={[
+              { value: "AVAILABLE", label: "Available" },
+              { value: "OCCUPIED", label: "Occupied" },
+            ]}
+            onChange={(val) => {
+              val === "AVAILABLE"
+                ? setStatus("AVAILABLE")
+                : setStatus("OCCUPIED");
+            }}
+          />
+        </div>
       </div>
 
       <div className="mb-10">
@@ -122,6 +199,7 @@ const ViewAndManage = () => {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Slot Name</Table.Th>
+              <Table.Th>Slot Status</Table.Th>
               <Table.Th>Vehicle Number</Table.Th>
               <Table.Th>Vehicle Type</Table.Th>
               <Table.Th>Entry Time</Table.Th>
