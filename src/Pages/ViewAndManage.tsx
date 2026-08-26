@@ -18,6 +18,7 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../Routes/routes";
+import CommonTable from "../Components/Navbar/Common/CommonTable";
 
 const ViewAndManage = () => {
   const [search, setSearch] = useState<string>("");
@@ -173,24 +174,17 @@ const ViewAndManage = () => {
       </div>
 
       <div className="pb-15 lg:w-210">
-        <Table
-          withTableBorder={true}
-          withColumnBorders={true}
-          highlightOnHover={true}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Slot Name</Table.Th>
-              <Table.Th>Slot Status</Table.Th>
-              <Table.Th>Vehicle Number</Table.Th>
-              <Table.Th>Vehicle Type</Table.Th>
-              <Table.Th>Entry Time</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-        {!rows.length && <p className="w-full text-center pt-5">No data</p>}
+        <CommonTable
+          data={rows}
+          headerName={[
+            "Slot Name",
+            "Slot Status",
+            "Vehicle Number",
+            "Vehicle Type",
+            "Entry Time",
+            "Action",
+          ]}
+        />
       </div>
     </div>
   );

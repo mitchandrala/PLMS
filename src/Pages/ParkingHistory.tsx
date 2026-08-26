@@ -1,6 +1,7 @@
 import { Table } from "@mantine/core";
 import { useSlots } from "../Hooks/useSlots";
 import type { SlotHistory } from "../Types/slotType";
+import CommonTable from "../Components/Navbar/Common/CommonTable";
 
 const ParkingHistory = () => {
   const { slotHistoryData } = useSlots();
@@ -21,26 +22,19 @@ const ParkingHistory = () => {
       <div>
         <h1 className="text-lg font-semibold text-center">Slot History</h1>
       </div>
-      <div className="w-full lg:w-250">
-        <Table
-          withTableBorder={true}
-          withColumnBorders={true}
-          highlightOnHover={true}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Slot Name</Table.Th>
-              <Table.Th>Vehicle Number</Table.Th>
-              <Table.Th>Vehicle Type</Table.Th>
-              <Table.Th>Entry Time</Table.Th>
-              <Table.Th>Exit Time</Table.Th>
-              <Table.Th>Duration</Table.Th>
-              <Table.Th>Charge</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-        {!rows.length && <p className="w-full text-center pt-5">No data</p>}
+      <div className="w-full pb-15 lg:w-250">
+        <CommonTable
+          data={rows}
+          headerName={[
+            "Slot Name",
+            "Vehicle Number",
+            "Vehicle Type",
+            "Entry Time",
+            "Exit Time",
+            "Duration",
+            "Charge",
+          ]}
+        />
       </div>
     </div>
   );
