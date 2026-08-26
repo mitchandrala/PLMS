@@ -28,16 +28,20 @@ const ViewAndManage = () => {
 
   const { activeSlots, slots, releaseSlot } = useSlots();
 
-  const tableData: ActiveSlotTable[] = slots.map((slot: Slot) => {
-    const activeSlot = activeSlots.find(
-      (activeSlot: ActiveSlot) => slot.slotName === activeSlot.slotName,
-    );
-    if (activeSlot) {
-      return { ...activeSlot, slotStatus: "OCCUPIED" };
-    } else {
-      return { slotName: slot.slotName, slotStatus: "AVAILABLE" };
-    }
-  });
+  const tableData: ActiveSlotTable[] = useMemo(
+    () =>
+      slots.map((slot: Slot) => {
+        const activeSlot = activeSlots.find(
+          (activeSlot: ActiveSlot) => slot.slotName === activeSlot.slotName,
+        );
+        if (activeSlot) {
+          return { ...activeSlot, slotStatus: "OCCUPIED" };
+        } else {
+          return { slotName: slot.slotName, slotStatus: "AVAILABLE" };
+        }
+      }),
+    [slots, activeSlots],
+  );
 
   const searchList = useMemo(() => {
     return tableData.filter((slot: ActiveSlotTable) => {

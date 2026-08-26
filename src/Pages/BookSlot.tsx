@@ -1,7 +1,7 @@
 import { Button, Checkbox, Select, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type {
   ActiveSlot,
   FormData,
@@ -38,20 +38,26 @@ const BookSlot = () => {
       .map((slot: Slot) => slot.slotName);
   };
 
-  const isVehicleOccupied = (vehicleNumber: string) => {
-    return activeSlots.find(
-      (val: ActiveSlot) => val.vehicleNumber === vehicleNumber,
-    );
-  };
+  const isVehicleOccupied = useMemo(
+    () => (vehicleNumber: string) => {
+      return activeSlots.find(
+        (val: ActiveSlot) => val.vehicleNumber === vehicleNumber,
+      );
+    },
+    [activeSlots],
+  );
 
-  const saveSlotForm = (value: ActiveSlot) => {
-    try {
-      bookSlot(value);
-      console.log("Slot Booked");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const saveSlotForm = useCallback(
+    (value: ActiveSlot) => {
+      try {
+        bookSlot(value);
+        console.log("Slot Booked");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [bookSlot],
+  );
 
   const initialValue: FormData = {
     slotName: null,
@@ -87,7 +93,7 @@ const BookSlot = () => {
     setVehType(value);
   });
 
-  const handleSubmit = async (formData: typeof form.values) => {
+  const handleSubmit = (formData: typeof form.values) => {
     const isExist = isVehicleOccupied(formData.vehicleNumber);
     if (isExist) {
       alert("This vehicle already occupy the slot.");

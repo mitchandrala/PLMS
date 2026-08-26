@@ -7,15 +7,24 @@ import type {
   SlotName,
   TotalVehicle,
 } from "../Types/slotType";
+import { useMemo } from "react";
 
 const Dashboard = () => {
   const { activeSlots, slots, slotHistoryData } = useSlots();
 
-  const occupiedSlot = activeSlots.map((slot: ActiveSlot) => slot.slotName);
-  const totalSlot = slots.map((slot: Slot) => slot.slotName);
+  const occupiedSlot = useMemo(
+    () => activeSlots.map((slot: ActiveSlot) => slot.slotName),
+    [activeSlots],
+  );
 
-  const availabaleSlot = totalSlot.filter(
-    (slot: SlotName) => !occupiedSlot.includes(slot),
+  const totalSlot = useMemo(
+    () => slots.map((slot: Slot) => slot.slotName),
+    [slots],
+  );
+
+  const availabaleSlot = useMemo(
+    () => totalSlot.filter((slot: SlotName) => !occupiedSlot.includes(slot)),
+    [totalSlot],
   );
 
   const totalVehicle: TotalVehicle = {
@@ -24,21 +33,25 @@ const Dashboard = () => {
     SUV: 0,
   };
 
-  activeSlots.map((slot: ActiveSlot) => {
-    if (slot.vehicleType === "BIKE") {
-      totalVehicle.BIKE += 1;
-    } else if (slot.vehicleType === "CAR") {
-      totalVehicle.CAR += 1;
-    } else {
-      totalVehicle.SUV += 1;
-    }
-  });
+  useMemo(
+    () =>
+      activeSlots.map((slot: ActiveSlot) => {
+        if (slot.vehicleType === "BIKE") {
+          totalVehicle.BIKE += 1;
+        } else if (slot.vehicleType === "CAR") {
+          totalVehicle.CAR += 1;
+        } else {
+          totalVehicle.SUV += 1;
+        }
+      }),
+    [activeSlots],
+  );
 
-  const totalRevenue = () => {
+  const totalRevenue = useMemo(() => {
     let totalRevenue = 0;
     slotHistoryData.map((slot: SlotHistory) => (totalRevenue += slot.charge));
     return totalRevenue;
-  };
+  }, [slotHistoryData]);
 
   return (
     <div className="max-h-screen h-170 w-full flex flex-col items-center p-10 gap-10">
@@ -81,7 +94,7 @@ const Dashboard = () => {
             </Table.Tr>
             <Table.Tr>
               <Table.Th w={120}>Total Revenue</Table.Th>
-              <Table.Td>{`₹${totalRevenue().toLocaleString()} `}</Table.Td>
+              <Table.Td>{`₹${totalRevenue.toLocaleString()} `}</Table.Td>
             </Table.Tr>
           </Table.Tbody>
         </Table>
