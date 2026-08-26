@@ -1,4 +1,7 @@
+import type { ActiveSlot, SlotHistory } from "../Types/slotType";
+
 type Key = "slotData" | "activeSlotData" | "slotHistoryData";
+type Value = ActiveSlot | SlotHistory;
 
 export const getStorageData = (key: Key) => {
   try {
@@ -14,7 +17,7 @@ export const getStorageData = (key: Key) => {
   }
 };
 
-export const setStorageData = (key: Key, value) => {
+export const setStorageData = (key: Key, value: Value[]) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
