@@ -148,6 +148,7 @@ const BookSlot = () => {
           className="w-50 flex flex-col gap-5"
         >
           <TextInput
+            withAsterisk
             label="Vehicle No."
             placeholder="Vehicle Number"
             key={form.key("vehicleNumber")}

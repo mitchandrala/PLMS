@@ -40,47 +40,52 @@ const Dashboard = () => {
     return totalRevenue;
   };
 
-  // console.log(availabaleSlot);
   return (
-    <div className="max-h-screen h-170 w-full flex flex-col p-10 gap-10">
+    <div className="max-h-screen h-170 w-full flex flex-col items-center p-10 gap-10">
       <h1 className="text-lg font-semibold text-center">Dashboard</h1>
-      <Table
-        variant="vertical"
-        layout="fixed"
-        withTableBorder={true}
-        withColumnBorders={true}
-      >
-        <Table.Tbody>
-          <Table.Tr>
-            <Table.Th w={120}>Total Slot</Table.Th>
-            <Table.Td>{totalSlot.length}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Available Slot</Table.Th>
-            <Table.Td>{availabaleSlot.join(", ")}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Occupied Slot</Table.Th>
-            <Table.Td>{occupiedSlot.join(", ")}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Total Bike</Table.Th>
-            <Table.Td>{totalVehicle.BIKE}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Total SUV</Table.Th>
-            <Table.Td>{totalVehicle.SUV}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Total CAR</Table.Th>
-            <Table.Td>{totalVehicle.CAR}</Table.Td>
-          </Table.Tr>
-          <Table.Tr>
-            <Table.Th w={120}>Total Revenue</Table.Th>
-            <Table.Td>{`₹${totalRevenue().toLocaleString()} `}</Table.Td>
-          </Table.Tr>
-        </Table.Tbody>
-      </Table>
+      <div className="lg:w-200">
+        <Table
+          variant="vertical"
+          layout="fixed"
+          withTableBorder={true}
+          withColumnBorders={true}
+        >
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Th w={120}>Total Slot</Table.Th>
+              <Table.Td>{totalSlot.length}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Available Slot</Table.Th>
+              <Table.Td>
+                {availabaleSlot.length ? availabaleSlot.join(", ") : "No slot"}
+              </Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Occupied Slot</Table.Th>
+              <Table.Td>
+                {occupiedSlot.length ? occupiedSlot.join(", ") : "No slot"}
+              </Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Total Bike</Table.Th>
+              <Table.Td>{totalVehicle.BIKE}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Total SUV</Table.Th>
+              <Table.Td>{totalVehicle.SUV}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Total CAR</Table.Th>
+              <Table.Td>{totalVehicle.CAR}</Table.Td>
+            </Table.Tr>
+            <Table.Tr>
+              <Table.Th w={120}>Total Revenue</Table.Th>
+              <Table.Td>{`₹${totalRevenue().toLocaleString()} `}</Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
+        </Table>
+      </div>
     </div>
   );
 };

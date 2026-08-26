@@ -6,7 +6,7 @@ const ParkingHistory = () => {
   const { slotHistoryData } = useSlots();
 
   const rows = slotHistoryData.map((slot: SlotHistory) => (
-    <Table.Tr key={slot.entryTime}>
+    <Table.Tr key={slot.exitTime}>
       <Table.Td>{slot?.slotName}</Table.Td>
       <Table.Td>{slot?.vehicleNumber}</Table.Td>
       <Table.Td>{slot?.vehicleType}</Table.Td>
@@ -17,11 +17,11 @@ const ParkingHistory = () => {
     </Table.Tr>
   ));
   return (
-    <div className="max-h-screen h-170 w-full flex flex-col p-10 gap-10">
+    <div className="max-h-screen h-170 w-full flex flex-col items-center p-10 gap-10">
       <div>
         <h1 className="text-lg font-semibold text-center">Slot History</h1>
       </div>
-      <div>
+      <div className="w-full lg:w-250">
         <Table
           withTableBorder={true}
           withColumnBorders={true}
@@ -40,6 +40,7 @@ const ParkingHistory = () => {
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
+        {!rows.length && <p className="w-full text-center pt-5">No data</p>}
       </div>
     </div>
   );

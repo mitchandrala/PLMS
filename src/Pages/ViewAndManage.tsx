@@ -27,14 +27,6 @@ const ViewAndManage = () => {
 
   const { activeSlots, slots, releaseSlot } = useSlots();
 
-  const activeSlotName = activeSlots.map(
-    (activeSlot: ActiveSlot) => activeSlot.slotName,
-  );
-
-  const filterSlot = slots
-    .filter((slot: Slot) => !activeSlotName.includes(slot.slotName))
-    .map((slot: Slot) => slot.slotName);
-
   const tableData: ActiveSlotTable[] = slots.map((slot: Slot) => {
     const activeSlot = activeSlots.find(
       (activeSlot: ActiveSlot) => slot.slotName === activeSlot.slotName,
@@ -139,13 +131,7 @@ const ViewAndManage = () => {
                 Release
               </Button>
             ) : (
-              <Button
-                size="xs"
-                variant="light"
-                onClick={() => navigate(ROUTES.BOOK_SLOT)}
-              >
-                Book slot
-              </Button>
+              "-"
             )}
           </>
         </Table.Td>
@@ -154,8 +140,8 @@ const ViewAndManage = () => {
   );
 
   return (
-    <div className="max-h-screen h-170 w-full flex flex-col p-10 gap-5">
-      <div>
+    <div className="max-h-screen h-170 w-full flex flex-col items-center p-10 gap-5">
+      <div className="mb-10">
         <h1 className="text-lg font-semibold text-center">View And Manage</h1>
       </div>
 
@@ -169,28 +155,24 @@ const ViewAndManage = () => {
         </div>
         <div>
           <Select
-            placeholder="Select Vehicle Type"
+            placeholder="Filter by Vehicle Type"
             data={["BIKE", "CAR", "SUV"]}
             onChange={(val) => setVehicle(val)}
           />
         </div>
         <div>
           <Select
-            placeholder="Select Vehicle Type"
+            placeholder="Filter by Slot Status"
             data={[
               { value: "AVAILABLE", label: "Available" },
               { value: "OCCUPIED", label: "Occupied" },
             ]}
-            onChange={(val) => {
-              val === "AVAILABLE"
-                ? setStatus("AVAILABLE")
-                : setStatus("OCCUPIED");
-            }}
+            onChange={(val) => setStatus(val)}
           />
         </div>
       </div>
 
-      <div className="mb-10">
+      <div className="pb-15 lg:w-210">
         <Table
           withTableBorder={true}
           withColumnBorders={true}
@@ -209,31 +191,6 @@ const ViewAndManage = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
         {!rows.length && <p className="w-full text-center pt-5">No data</p>}
-      </div>
-
-      <div className="flex flex-col gap-3 mb-10">
-        <div>
-          <h2 className="text-md font-semibold">Available Slot:</h2>
-        </div>
-        <div>
-          <Table
-            variant="vertical"
-            layout="fixed"
-            withTableBorder={true}
-            withColumnBorders={true}
-          >
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Th w={120}>Slot Name</Table.Th>
-                <Table.Td>{filterSlot.join(", ")}</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Th w={120}>Status</Table.Th>
-                <Table.Td>Available</Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          </Table>
-        </div>
       </div>
     </div>
   );
